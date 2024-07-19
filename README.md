@@ -8,10 +8,13 @@
 
 # Сертификат
 <img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/Certificate.png" />
+<br/>
 
 # API
-<img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/api1.png" />
 <img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/api2.png" />
+<img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/api1.png" />
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 # Требования к проекту
 
