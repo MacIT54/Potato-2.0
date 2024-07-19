@@ -6,15 +6,30 @@
 “Картошка” - это отечественный электронный кошелек, который позволяет оплачивать услуги, делать денежные переводы в
 рамках системы. 
 
+Вклад в проект:
+* проектирование и доработка API
+* создание DTO-объектов
+* реализация маппинга
+* разработка бизнес-логики
+* реализация взаимодействия с БД (Postgre SQL)
+* настройка Spring Security, для авторизации используется JWT-токен
+* внедрение логирования
+* написание тестов
+* составление json-запросов и работа с ними в Postman
+* работа с Git
+
+API и JSON для Postman находятся в корневой папке проекта
+
 # Сертификат
 <img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/Certificate.png" />
-<br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 # API
 <img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/api2.png" />
 <img align="left" alt="C" src="https://github.com/MacIT54/Potato-2.0/blob/main/docs/api1.png" />
 
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 # Требования к проекту
 
