@@ -1,0 +1,981 @@
+openapi: 3.0.3
+info:
+  title: PotatoWallet - OpenAPI 3.0.3
+  description: |-
+    “Картошка” - это отечественный электронный кошелек, который позволяет оплачивать
+    услуги, делать денежные переводы в рамках системы. 
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api/v1/
+#----------------------------------Users----------------------------------#
+paths:
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Создание пользователя
+      description: Создание пользователя
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426655440000'        
+        '400':
+          description: Передан некорректный параметр
+        '500':
+          description: Внутренняя ошибка
+    patch:
+      tags:
+        - Users
+      summary: Редактирование полей пользователя
+      security:
+        - bearerAuth: []
+      description: Редактирование полей пользователя (только ФИО, дата рождения)
+      operationId: editUser
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426655440000"
+      requestBody:
+        description:  Для вызова требуется передача токена авторизации в заголовке
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreEditUser'
+              
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditUser'        
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '403':
+          description: Доступ запрещен
+        '500':
+          description: Внутренняя ошибка
+    get:
+      tags:
+        - Users
+      summary:  Получение пользователя
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getUser
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUser'       
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '403':
+          description: Доступ запрещен
+        '500':
+          description: Внутренняя ошибка
+  #----------------------------------Sessions----------------------------------#
+  /users/sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Создание сессии (вход в аккаунт)
+      operationId: signIn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignIn'
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponse'
+        '400':
+          description: Передан некорректный параметр
+        '500':
+          description: Внутренняя ошибка
+    delete:
+      tags:
+        - Sessions
+      summary: Выход из сессии (выход из аккаунта)
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: signOut
+      responses:
+        '200':
+          description: Успешный вызов
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '403':
+          description: Доступ запрещен
+        '500':
+          description: Внутренняя ошибка
+  /users/sessions/current:
+    get:
+      tags:
+        - Sessions
+      summary: Получение информации о сессии
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getCurrentSession
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - expirationTime
+                  - active
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426655440000'
+                  userId:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426655440000'
+                  expirationTime: 
+                    format: date-time 
+                  active:
+                    type: boolean
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+  #----------------------------------Wallet----------------------------------#
+  /hesoyam:
+    post:
+      tags:
+        - Wallets
+      summary: HESOYAM - с 25% шансом пользователь получает на счёт 10 д.е.
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getHesoyam
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - walletId
+              properties:
+                walletNumber:
+                  type: integer 
+                  example: 12345
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  walletNumber:
+                    type: integer
+                    example: 12345
+                  walletBalance:
+                    type: integer
+                    example: 110
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '403':
+          description: Доступ запрещен
+        '500':
+          description: Внутренняя ошибка
+  /wallet:
+    get:
+      tags:
+        - Wallets
+      summary: Получение информации о кошельке
+      security:
+        - bearerAuth: []
+      description: 'Для вызова требуется передача токена авторизации в заголовке'
+      operationId: getBill
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - walletId
+                  - walletBalance
+                  - lastUpdate
+                  - walletNumber
+                properties:
+                  walletId:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426655440000'
+                  walletNumber:
+                    type: integer
+                    example: 12345
+                  walletBalance:
+                    type: integer
+                    example: 110
+                  lastUpdate: 
+                    format: date-time 
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+   #----------------------------------Invoices----------------------------------#
+  /invoice:
+    post:
+      tags:
+        - Invoices
+      summary: Создание счёта на оплату
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: createMaintenance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewInvoice'
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+  /invoice/{id}: 
+    get:
+      tags:
+        - Invoices
+      parameters:
+        - name: id
+          in: path
+          description: id счёта
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: '123e4567-e89b-12d3-a456-426655440000'
+      summary: Получение информации о счёте на оплату
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getMaintenance
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '404':
+          description: Счёт не найден
+        '500':
+          description: Внутренняя ошибка
+  /invoice/{id}/cancel:
+    delete:
+      tags:
+        - Invoices
+      parameters:
+        - name: id
+          in: path
+          description: id счёта
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: '123e4567-e89b-12d3-a456-426655440000'
+      summary: Отмена счёта на оплату отправителем
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: deleteMaintenance
+      responses:
+        '200':
+          description: Успешный вызов
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '404':
+          description: Счёт не найден
+        '500':
+          description: Внутренняя ошибка
+  /invoice/{id}/pay:
+    post:
+      parameters:
+      - name: id
+        in: path
+        description: id счёта
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: '123e4567-e89b-12d3-a456-426655440000'
+      tags:
+        - Invoices
+      summary: Оплата счёта на оплату получателем
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: payMaintenance
+      responses:
+        '200':
+          description: Успешный вызов
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    enum:
+                     - Paid
+                     - Unpaid
+                     - Canceled  
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '404':
+          description: Счёт не найден
+        '500':
+          description: Внутренняя ошибка
+  /invoice/sent:
+    get:
+      tags:
+        - Invoices
+      summary: Получение всех выставленных счетов
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке. Поддерживаются фильтры по статусу, датам выставления и идентификатору.
+      operationId: getSentInvoices
+      parameters:
+        - name: status
+          in: query
+          description: Статус счета (оплачен/неоплачен/отменён)
+          required: false
+          schema:
+            type: string
+            enum:
+              - PAID
+              - UNPAID
+              - CANCELED
+        - name: startDate
+          in: query
+          description: Дата начала периода выставления счетов (в формате ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Дата окончания периода выставления счетов (в формате ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список выставленных счетов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceList'
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+  /invoice/received:
+    get:
+      tags:
+        - Invoices
+      summary: Получение всех счетов к оплате
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке. Поддерживаются фильтры по статусу, датам выставления и идентификатору.
+      operationId: getReceivedInvoices
+      parameters:
+        - name: status
+          in: query
+          description: Статус счета (оплачен/неоплачен/отменён)
+          required: false
+          schema:
+            type: string
+            enum:
+              - PAID
+              - UNPAID
+              - CANCELED
+        - name: startDate
+          in: query
+          description: Дата начала периода выставления счетов (в формате ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Дата окончания периода выставления счетов (в формате ISO 8601)
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Список счетов к оплате
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceivedInvoices'
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+
+  /invoice/oldestUnpaid:
+    get:
+      tags:
+        - Invoices
+      summary: Получение наиболее давнего неоплаченного счёта к оплате
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getOldestUnpaidInvoice
+      responses:
+        '200':
+          description: Счёт к оплате
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+  /invoice/totalOutStanding:
+    get:
+      tags:
+        - Invoices
+      summary: Получение общей задолженности по неоплаченным счетам к оплате
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getTotalOutstanding
+      responses:
+        '200':
+          description: Общая задолженность по неоплаченным счетам
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOutstanding:
+                    type: number
+                    format: int64
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+
+   #----------------------------------Transfers----------------------------------#
+  /transfers:
+    post:
+      tags:
+        - Transfers
+      summary: Создание (оно же выполнение) денежного перевода
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: createTransfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transfer'
+      responses:
+        '200':
+          description: Информация о переводе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AboutTransfer'
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+  /transfers/{id}:        
+    get:
+      tags:
+        - Transfers
+      parameters:
+      - name: id
+        in: path
+        description: id счёта
+        required: true
+        schema:
+          type: string
+          format: uuid
+          example: '123e4567-e89b-12d3-a456-426655440000'
+      summary: Получение информации о переводе
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getTransfer
+      responses:
+        '200':
+          description: Информация о переводе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AboutTransfer'
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '404':
+          description: Перевод не найден
+        '500':
+          description: Внутренняя ошибка
+  /transfers/history:
+    get:
+      parameters:
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum: [Incoming, Outcoming]
+          example: Outcoming
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [Paid, Unpaid]
+          example: Paid
+      - name: receiverId
+        in: query
+        schema:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426655440000"
+      tags:
+        - Transfers
+      summary: Получение истории переводов
+      security:
+        - bearerAuth: []
+      description: Для вызова требуется передача токена авторизации в заголовке
+      operationId: getTransfersHistory
+      responses:
+        '200':
+          description: История переводов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransfersHistory'
+        '400':
+          description: Передан некорректный параметр
+        '401':
+          description: Требуется авторизация
+        '500':
+          description: Внутренняя ошибка
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - phoneNumber
+        - birthDate
+      properties:
+        firstName:
+          type: string
+          example: James
+        lastName:
+          type: string
+          example: Madison
+        email:
+          type: string
+          example: james123@email.com
+        password:
+          type: string
+          example: 'Password123'
+        phoneNumber:
+          type: string
+          pattern: "^7\\d{10}$"
+          example: '79991112233'
+        birthDate:
+          type: string
+          format: date
+          
+    GetUser:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        lastName: 
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'Madison'
+        firstName:
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'James'
+        phoneNumber:
+          type: string
+          pattern: "^7\\d{10}$"
+          example: '79991112233'
+        email:
+          type: string
+          format: email
+        birthDate:
+          type: string
+          format: date
+        registrationDate:
+          type: string
+          format: date-time
+        lastUpdateDate:
+          type: string
+          format: date-time    
+    PreEditUser:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        lastName: 
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'Madison'
+        firstName:
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'James'
+        birthDate:
+          type: string
+          format: date
+    EditUser:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        lastName: 
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'Johnson'
+        firstName:
+          type: string
+          pattern: "^[А-ЯЁ][а-яё]{0,49}$"
+          example: 'William'
+        birthDate:
+          type: string
+          format: date
+          example: 1987-09-07
+    SignIn:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          example: 'Password123'
+          minLength: 8
+          maxLength: 64
+    SignInResponse:
+      type: object
+      required:
+        - id
+        - userId
+        - token
+        - expirationTime
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        userId:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        token:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJCTzIxMjEyM0BtYWlsLnJ1IiwidXNlcklkIjoiNjI2OTUyMWItODEyYy00MDM3LWIyYWUtNWNhYTNkMWViOTQyIiwiaWF0IjoxNzE5NTc4NzEyLCJleHAiOjE3MTk1ODA1MTJ9._qS7WqbWycPCGTRpBgIjSQEGXJMj4qPGhOPbl4S_7o8'
+        expirationTime: 
+          format: date-time 
+    Transfer:
+      type: object
+      required:
+       - amount
+       - transferType
+       - receiverWallet
+       - transferDate
+      properties:
+        amount:
+          type: number
+          format: float
+          example: 100.00
+        transferType:
+          type: string
+          enum:
+            - User
+            - Service
+        receiverPhone:
+          type: string
+          pattern: "^7\\d{10}$"
+          example: '79991112233'
+        receiverWallet:
+          type: integer
+          example: 12345
+        serviceNumber:
+          type: string
+          example: "Cleaning345"
+        transferDate:
+          type: string
+          format: date-time
+    AboutTransfer:
+      type: object
+      properties:
+        transferId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426655440000"
+        amount:
+          type: number
+          format: float
+          example: 100.00
+        transferType:
+          type: string
+          enum:
+            - User
+            - Service
+        receiverPhone:
+          type: string
+          pattern: "^7\\d{10}$"
+          example: '79991112233'
+        receiverWallet:
+          type: integer
+          example: 12345
+        serviceNumber:
+          type: string
+          example: "Cleaning345"
+        status:
+          type: string
+          enum:
+            - Paid
+            - Unpaid
+        transferDate:
+          type: string
+          format: date-time
+    TransfersHistory:
+      type: array
+      items:
+        type: object
+        properties:
+          transferId:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426655440000"
+          amount:
+            type: number
+            format: float
+            example: 100.00
+          transferType:
+            type: string
+            enum:
+              - User
+              - Service
+          receiverPhone:
+            type: string
+            pattern: "^7\\d{10}$"
+            example: '79991112233'
+          receiverWallet:
+            type: integer
+            example: 12345
+          serviceNumber:
+            type: string
+            example: "Cleaning345"
+          status:
+            type: string
+            enum:
+              - Paid
+              - Unpaid
+          transferDate:
+            type: string
+            format: date-time
+    NewInvoice:
+      type: object
+      required:
+        - cost
+        - senderId
+        - receiverId
+        - comment
+      properties:
+        cost:
+          type: integer
+          example: 3990
+        senderId:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        receiverId: 
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        comment:
+          type: string
+          example: 'Cost of service'
+          maxLength: 250
+        invoiceDate:
+          type: string
+          format: date-time
+    InvoiceResponse: 
+      type: object
+      required:
+        - id
+        - cost
+        - senderId
+        - receiverId
+        - comment
+        - status
+        - invoiceDate
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        cost:
+          type: integer
+          example: 3990
+        senderId:
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        receiverId: 
+          type: string
+          example: '123e4567-e89b-12d3-a456-426655440000'
+        comment:
+          type: string
+          example: 'Cost of service'
+          maxLength: 250
+        status:
+          type: string
+          enum:
+           - Unpaid
+           - Paid
+           - Canceled
+        invoiceDate:
+          format: date-time 
+    InvoiceList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          cost:
+            type: integer
+            example: 3990
+          senderId:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          receiverId: 
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          comment:
+            type: string
+            example: 'Cost of service'
+            maxLength: 250
+          status:
+            type: string
+            enum:
+             - Paid
+             - Unpaid
+             - Canceled
+          invoiceDate:
+            format: date-time 
+    ReceivedInvoices:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          cost:
+            type: integer
+            example: 3990
+          senderId:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          receiverId: 
+            type: string
+            example: '123e4567-e89b-12d3-a456-426655440000'
+          comment:
+            type: string
+            example: 'Cost of service'
+            maxLength: 250
+          status:
+            type: string
+            enum:
+             - Unpaid
+             - Paid
+             - Canceled
+          invoiceDate:
+            format: date-time 

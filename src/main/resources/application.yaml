@@ -1,0 +1,38 @@
+server:
+    port: 8080
+
+jwt:
+    secret: r1Wq3Y7Ql8ivrpC4A6vEgBg1kllCKCrFkwhbZUNZ6Y8=
+    lifetime: 30m
+
+
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5430/wallet
+        username: wallet
+        password: wallet
+    flyway:
+        enabled: true
+        locations:
+          - db.migration
+        encoding: UTF-8
+        baselineOnMigrate: true
+management:
+    endpoints:
+        web:
+            exposure:
+                include: "*"
+        jnx:
+            exposure:
+                include: "*"
+    prometheus:
+        metrics:
+            export:
+                enabled: true
+
+logging:
+    level:
+        org.springframework.web: "info"
+
+
+
